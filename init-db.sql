@@ -1,11 +1,21 @@
 -- CREATE TABLE
 DROP TABLE IF EXISTS accounts;
+
 CREATE TABLE accounts (
     account_number INTEGER PRIMARY KEY,
     name VARCHAR NOT NULL,
     amount INTEGER NOT NULL,
     type VARCHAR NOT NULL,
     credit_limit INTEGER
+);
+
+CREATE TABLE transaction_history (
+    id SERIAL PRIMARY KEY,
+    account_number INTEGER NOT NULL,
+    transaction_date TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    amount INTEGER NOT NULL,
+    type VARCHAR(20) CHECK (type IN ('withdrawal', 'deposit')),
+    FOREIGN KEY (account_number) REFERENCES accounts(account_number)
 );
 
 ALTER TABLE accounts ADD CONSTRAINT verify_type
