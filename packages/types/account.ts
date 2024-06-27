@@ -1,7 +1,7 @@
 export type Account = {
-  accountNumber: number;
+  account_number: number;
   name: string;
   amount: number;
-  type: 'checking' | 'savings' | 'credit';
-  creditLimit: number;
-}
+  type: "checking" | "savings" | "credit";
+  credit_limit: number;
+};

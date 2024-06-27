@@ -3,16 +3,26 @@ import { Paper, Grid, TextField, Button } from "@mui/material";
 import { useMutation, useQueryClient } from "react-query";
 import { fetchAccount } from "../api/account";
 import { toast } from "react-toastify";
+import { useSetAtom } from "jotai";
+import { authAtom } from "../atoms";
 
 export const SignIn = () => {
   const [accountNumberError, setAccountNumberError] = useState(false);
+
+  const setToken = useSetAtom(authAtom);
 
   const queryClient = useQueryClient();
 
   const { mutate: onSignIn } = useMutation({
     mutationFn: (accountNumber: string) => fetchAccount(accountNumber),
     onSuccess(data) {
-      queryClient.setQueryData(["account", data.accountNumber], data);
+      queryClient.setQueryData(
+        ["account", data.account_number.toString()],
+        data
+      );
+      if (data.account_number) {
+        setToken(data.account_number.toString());
+      }
     },
     onError() {
       toast.error("Account not found");
