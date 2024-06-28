@@ -52,6 +52,7 @@
     "react-app-polyfill": "^3.0.0",
     "react-dev-utils": "^12.0.1",
     "react-dom": "^18.3.1",
+    "react-hook-form": "^7.45.0",
     "react-query": "^3.39.3",
     "react-refresh": "^0.11.0",
     "react-toastify": "^10.0.5",
@@ -71,12 +72,15 @@
     "workbox-webpack-plugin": "^6.4.1"
   },
   "devDependencies": {
-    "@ae/types": "workspace:*"
+    "@ae/types": "workspace:*",
+    "@babel/plugin-proposal-private-property-in-object": "^7.21.11"
   },
   "scripts": {
     "start": "PORT=3001 node scripts/start.js",
+    "start:dev": "PORT=3001 node scripts/start.js",
     "build": "node scripts/build.js",
-    "test": "node scripts/test.js"
+    "test": "node scripts/test.js",
+    "lint": "pnpm eslint ."
   },
   "eslintConfig": {
     "extends": [

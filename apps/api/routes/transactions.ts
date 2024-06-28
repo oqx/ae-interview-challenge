@@ -21,7 +21,7 @@ router.put(
     try {
       const updatedAccount = await withdrawal(
         request.params.accountID,
-        request.body.amount
+        +request.body.amount
       );
 
       if (isApiErrorsObject(updatedAccount)) {
@@ -30,7 +30,6 @@ router.put(
 
       return response.status(200).send(updatedAccount);
     } catch (err) {
-      console.log(err);
       if (err instanceof Error) {
         return response.status(400).send({ error: err.message });
       }
@@ -50,7 +49,7 @@ router.put(
     try {
       const updatedAccount = await deposit(
         request.params.accountID,
-        request.body.amount
+        +request.body.amount
       );
 
       if (isApiErrorsObject(updatedAccount)) {

@@ -1,19 +1,22 @@
-import { FormEvent, useCallback, useState } from "react";
-import { Paper, Grid, TextField, Button } from "@mui/material";
+import { Paper, Grid, TextField } from "@mui/material";
 import { useMutation, useQueryClient } from "react-query";
 import { fetchAccount } from "../api/account";
 import { toast } from "react-toastify";
 import { useSetAtom } from "jotai";
 import { authAtom } from "../atoms";
+import { useForm, get } from "react-hook-form";
+import LoadingButton from "@mui/lab/LoadingButton";
 
 export const SignIn = () => {
-  const [accountNumberError, setAccountNumberError] = useState(false);
-
   const setToken = useSetAtom(authAtom);
 
   const queryClient = useQueryClient();
 
-  const { mutate: onSignIn } = useMutation({
+  const { register, handleSubmit, formState } = useForm<{
+    accountNumber: string;
+  }>({ mode: "onBlur" });
+
+  const { mutate: onSignIn, isLoading } = useMutation({
     mutationFn: (accountNumber: string) => fetchAccount(accountNumber),
     onSuccess(data) {
       queryClient.setQueryData(
@@ -25,24 +28,15 @@ export const SignIn = () => {
       }
     },
     onError() {
-      toast.error("Account not found");
-      setAccountNumberError(true);
+      toast.error("Account not found", { theme: "colored" });
     },
   });
 
-  const onSubmit = useCallback(
-    async (e: FormEvent<HTMLFormElement>) => {
-      e.preventDefault();
-
-      const form = new FormData(e.currentTarget);
-
-      const accountNumber = form.get("accountNumber");
-      if (typeof accountNumber === "string") {
-        onSignIn(accountNumber);
-      }
-    },
-    [onSignIn]
-  );
+  const onSubmit = handleSubmit(async ({ accountNumber }) => {
+    if (typeof accountNumber === "string") {
+      onSignIn(accountNumber);
+    }
+  });
 
   return (
     <Paper sx={{ border: 20, borderBottom: 30, borderColor: "white" }}>
@@ -51,19 +45,32 @@ export const SignIn = () => {
         <Grid container>
           <Grid item xs={2} />
           <Grid item xs={8}>
-            <TextField
-              type="number"
-              variant="outlined"
-              label="Account Number"
-              name="accountNumber"
-              sx={{ display: "flex", margin: "auto" }}
-              error={accountNumberError}
-            />
+            <div className="input">
+              <TextField
+                type="number"
+                variant="outlined"
+                label="Account Number"
+                sx={{ display: "flex", margin: "auto" }}
+                error={get(formState, "errors.accountNumber.message")}
+                {...register("accountNumber", {
+                  required: {
+                    value: true,
+                    message: "Account number is required",
+                  },
+                })}
+              />
+              {!!get(formState, "errors.accountNumber.message") && (
+                <p className="input__error">
+                  {get(formState, "errors.accountNumber.message")}
+                </p>
+              )}
+            </div>
           </Grid>
           <Grid item xs={2} />
         </Grid>
-        <Button
+        <LoadingButton
           variant="contained"
+          loading={isLoading}
           color="primary"
           type="submit"
           sx={{
@@ -73,7 +80,7 @@ export const SignIn = () => {
           }}
         >
           Sign In
-        </Button>
+        </LoadingButton>
       </form>
     </Paper>
   );

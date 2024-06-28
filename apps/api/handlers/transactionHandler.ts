@@ -44,13 +44,13 @@ export const withdrawal = async (
 
   if (
     account.type === "credit" &&
-    account.creditLimit < Math.abs(account.amount) + amount
+    account.credit_limit < Math.abs(account.amount) + amount
   ) {
     errors.push({
       error: "CREDIT_LIMIT_EXCEEDED",
-      message: `Withdrawal exceeds available credit of ${
-        account.creditLimit
-      } by ${Math.abs(account.amount) + amount - account.creditLimit}.`,
+      message: `Withdrawal exceeds available credit of $${
+        account.credit_limit
+      } by $${Math.abs(account.amount) + amount - account.credit_limit}.`,
     });
   }
 
@@ -94,7 +94,7 @@ export const withdrawal = async (
 };
 
 export const deposit = async (
-  accountID: string,
+  accountId: string,
   amount: number
 ): Promise<{ errors: ApiError[] } | Account> => {
   if (amount > 1000) {
@@ -107,7 +107,7 @@ export const deposit = async (
       ],
     };
   }
-  const account = await getAccount(accountID);
+  const account = await getAccount(accountId);
 
   if (account.type === "credit" && account.amount + amount > 0) {
     return {
@@ -122,12 +122,14 @@ export const deposit = async (
 
   account.amount += amount;
 
+  await updateTransactionHistory({ accountId, amount, type: "deposit" });
+
   const res = await query<Account>(
     `
     UPDATE accounts
     SET amount = $1 
     WHERE account_number = $2`,
-    [account.amount, accountID]
+    [account.amount, accountId]
   );
 
   if (res.rowCount === 0) {
@@ -188,13 +190,18 @@ const deriveErrorFromWithdrawalLimit = async ({
   const totalWithdrawnToday = +res.rows[0].total_withdrawal_amount || 0;
 
   if (totalWithdrawnToday + amount > DAILY_WITHDRAWAL_LIMIT) {
+    const message =
+      totalWithdrawnToday - DAILY_WITHDRAWAL_LIMIT === 0
+        ? `You've met your withdrawal limit for the day.`
+        : `You have $${
+            DAILY_WITHDRAWAL_LIMIT - totalWithdrawnToday
+          } remaining in withdrawals.`;
+
     return {
       errors: [
         {
           error: "DAILY_LIMIT_EXCEEDED",
-          message: `Could not complete withdrawal of ${amount} as your account will exceed the daily withdrawal limit of ${DAILY_WITHDRAWAL_LIMIT} by ${
-            totalWithdrawnToday + amount - DAILY_WITHDRAWAL_LIMIT
-          }.`,
+          message: `Cannot exceed daily withdrawal amount of $400. ${message}`,
         },
       ],
     };

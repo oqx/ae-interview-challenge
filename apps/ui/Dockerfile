@@ -1,8 +1,18 @@
 FROM node:20.10.0
+
+ENV PNPM_HOME="/pnpm"
+ENV PATH="$PNPM_HOME:$PATH"
+
+RUN corepack enable
+
 WORKDIR .
-COPY package*.json ./
-RUN npm install
 COPY . .
-RUN npm run build
+
+RUN pnpm install --prod --frozen-lockfile
+
+WORKDIR ./apps/ui
+
+RUN pnpm run build
+
 EXPOSE 3001
-CMD ["npm", "run", "start"]
+CMD ["pnpm", "start"]

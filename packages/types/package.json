@@ -2,12 +2,16 @@
   "name": "@ae/types",
   "version": "1.0.0",
   "description": "",
-  "main": "index.ts",
-  "typings": "index.ts",
+  "main": "index.d.ts",
+  "typings": "index.d.ts",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "lint": "pnpm eslint ."
   },
   "keywords": [],
   "author": "",
-  "license": "ISC"
+  "license": "ISC",
+  "devDependencies": {
+    "tsup": "^8.1.0"
+  }
 }
