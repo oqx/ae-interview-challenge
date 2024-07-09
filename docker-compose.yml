@@ -16,7 +16,7 @@ services:
   api:
     container_name: challenge_api
     build: 
-      context: ./
+      context: .
       dockerfile: ./apps/api/Dockerfile
     environment:
       DATABASE_URL: ${DATABASE_URL}
@@ -24,11 +24,12 @@ services:
     ports:
       - "3000:3000"
     volumes:
-      - node_modules:/apps/api/node_modules
+      - ./:/app
+      - /app/apps/api/node_modules
   ui:
     container_name: challenge_ui
     build: 
-      context: ./
+      context: .
       dockerfile: ./apps/ui/Dockerfile
     ports:
       - "3001:3001"
