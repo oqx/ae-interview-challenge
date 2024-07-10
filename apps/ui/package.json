@@ -47,7 +47,7 @@
     "dev": "vite",
     "start": "pnpm serve -s -p 3001 dist",
     "build": "tsc && vite build",
-    "preview": "vite preview",
+    "start:dev": "vite preview",
     "lint": "pnpm eslint ."
   },
   "eslintConfig": {
